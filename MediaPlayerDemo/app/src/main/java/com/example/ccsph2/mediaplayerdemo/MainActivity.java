@@ -58,10 +58,10 @@ public class MainActivity extends AppCompatActivity {
 
         // Play SD card content
         // playMedia("/storage/emulated/0/sample0.mp3");
-        playMedia("/storage/E5E3-8FAE/sample0.mp3");
+        // playMedia("/storage/E5E3-8FAE/sample0.mp3");
 
         // Play internet content
-        // playMedia("https://allthingsaudio.wikispaces.com/file/view/Shuffle%20for%20K.M.mp3/139190697/Shuffle%20for%20K.M.mp3");
+        playMedia("https://allthingsaudio.wikispaces.com/file/view/Shuffle%20for%20K.M.mp3/139190697/Shuffle%20for%20K.M.mp3");
     }
 
     public void onClickStopButton(View view){
