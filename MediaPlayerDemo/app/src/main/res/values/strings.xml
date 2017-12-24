@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">MediaPlayerDemo</string>
+    <string name="HelloDemo">Hello Demo</string>
+    <string name="TapToPlay">Tap to play</string>
+    <string name="Taptoplay">Play</string>
+    <string name="Taptostop">Stop</string>
+    <string name="Taptopause">Pause</string>
+    <string name="Resume">Resume</string>
+</resources>
