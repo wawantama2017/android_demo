@@ -55,9 +55,6 @@ public class MediaPlayerService extends Service
 
         // register broadcast receivers
         register_playAudio();
-        register_stopAudio();
-        register_pauseAudio();
-        register_resumeAudio();
         register_audioInterrupt(); // for headset plug, unplug, output change
     }
 
@@ -194,21 +191,21 @@ public class MediaPlayerService extends Service
         }
     }
 
-    private void stopMedia() {
+    public void stopMedia() {
         if (mMediaPlayer == null) return;
         if (mMediaPlayer.isPlaying()) {
             mMediaPlayer.stop();
         }
     }
 
-    private void pauseMedia() {
+    public void pauseMedia() {
         if (mMediaPlayer.isPlaying()) {
             mMediaPlayer.pause();
             mCurrentPosition = mMediaPlayer.getCurrentPosition();
         }
     }
 
-    private void resumeMedia() {
+    public void resumeMedia() {
         if (!mMediaPlayer.isPlaying()) {
             mMediaPlayer.seekTo(mCurrentPosition);
             mCurrentPosition = 0;
@@ -223,21 +220,6 @@ public class MediaPlayerService extends Service
     private void register_playAudio(){
         IntentFilter filter = new IntentFilter(com.example.ccsph2.mediaplayerdemo.MainActivity.BC_PLAY_AUDIO_WARIH);
         registerReceiver(receivePlayAudio, filter);
-    }
-
-    private void register_stopAudio() {
-        IntentFilter filter = new IntentFilter(com.example.ccsph2.mediaplayerdemo.MainActivity.BC_STOP_AUDIO_WARIH);
-        registerReceiver(receiveStopAudio, filter);
-    }
-
-    private void register_pauseAudio(){
-        IntentFilter filter = new IntentFilter(com.example.ccsph2.mediaplayerdemo.MainActivity.BC_PAUSE_AUDIO_WARIH);
-        registerReceiver(receivePauseAudio, filter);
-    }
-
-    private void register_resumeAudio(){
-        IntentFilter filter = new IntentFilter(com.example.ccsph2.mediaplayerdemo.MainActivity.BC_RESUME_AUDIO_WARIH);
-        registerReceiver(receiveResumeAudio, filter);
     }
 
     private void register_audioInterrupt(){
@@ -256,27 +238,6 @@ public class MediaPlayerService extends Service
             stopMedia();
             mMediaPlayer.reset();
             initializeMediaPlayer();
-        }
-    };
-
-    private BroadcastReceiver receiveStopAudio = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            stopMedia();
-        }
-    };
-
-    private BroadcastReceiver receivePauseAudio = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            pauseMedia();
-        }
-    };
-
-    private BroadcastReceiver receiveResumeAudio = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            resumeMedia();
         }
     };
 

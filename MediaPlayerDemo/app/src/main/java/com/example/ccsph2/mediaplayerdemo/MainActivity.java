@@ -14,10 +14,7 @@ import android.widget.Toast;
 public class MainActivity extends AppCompatActivity {
 
     // Broadcast intent
-    public static final String BC_PLAY_AUDIO_WARIH = "com.example.ccsph2.mediaplayernissan4.PlayAudioWarih";
-    public static final String BC_STOP_AUDIO_WARIH = "com.example.ccsph2.mediaplayernissan4.StopAudioWarih";
-    public static final String BC_PAUSE_AUDIO_WARIH = "com.example.ccsph2.mediaplayernissan4.PauseAudioWarih";
-    public static final String BC_RESUME_AUDIO_WARIH = "com.example.ccsph2.mediaplayernissan4.ResumeAudioWarih";
+    public static final String BC_PLAY_AUDIO_WARIH = "com.example.ccsph2.mediaplayerdemo.PlayAudioWarih";
 
     // MediaPlayer service
     private MediaPlayerService mPlayer;
@@ -111,23 +108,26 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void stopMedia(){
-        if (bServiceConnected) {
-            Intent broadcastIntent = new Intent(BC_STOP_AUDIO_WARIH);
-            sendBroadcast(broadcastIntent);
-        }
+        //if (bServiceConnected) {
+        //    Intent broadcastIntent = new Intent(BC_STOP_AUDIO_WARIH);
+        //    sendBroadcast(broadcastIntent);
+        //}
+        mPlayer.stopMedia();
     }
 
     private void pauseMedia(){
-        if (bServiceConnected) {
-            Intent broadcastIntent = new Intent(BC_PAUSE_AUDIO_WARIH);
-            sendBroadcast(broadcastIntent);
-        }
+        //if (bServiceConnected) {
+        //    Intent broadcastIntent = new Intent(BC_PAUSE_AUDIO_WARIH);
+        //    sendBroadcast(broadcastIntent);
+        //}
+        mPlayer.pauseMedia();
     }
 
     private void resumeMedia(){
-        if (bServiceConnected) {
-            Intent broadcastIntent = new Intent(BC_RESUME_AUDIO_WARIH);
-            sendBroadcast(broadcastIntent);
-        }
+        //if (bServiceConnected) {
+        //    Intent broadcastIntent = new Intent(BC_RESUME_AUDIO_WARIH);
+        //    sendBroadcast(broadcastIntent);
+        //}
+        mPlayer.resumeMedia();
     }
 }
