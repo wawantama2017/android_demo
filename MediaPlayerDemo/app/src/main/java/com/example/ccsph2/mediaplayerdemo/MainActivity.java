@@ -1,15 +1,21 @@
 package com.example.ccsph2.mediaplayerdemo;
 
 import android.content.ComponentName;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.IBinder;
+import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
+
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -34,6 +40,7 @@ public class MainActivity extends AppCompatActivity {
                         1);
             }
         }
+        prepareContentList();
     }
 
     @Override
@@ -93,14 +100,26 @@ public class MainActivity extends AppCompatActivity {
 
     // Play Audio
     private void playMedia (String media) {
+        ContentDataStorage storage = new ContentDataStorage(getApplicationContext());
+        // temporary
+        int contentIndex = 0;
+
         // First bind
         if (!bServiceConnected) {
+            // Store Content List to Shared Preferences
+            storage.storeContent(contentList);
+            storage.storeContentIndex(contentIndex);
+
+            // Throw intent
             Intent playerIntent = new Intent (this, MediaPlayerService.class);
             playerIntent.putExtra("media", media);
             startService(playerIntent);
             bindService(playerIntent, mServiceConnection, Context.BIND_AUTO_CREATE);
         }
         else {
+            // Store latest selected content index
+            storage.storeContentIndex(contentIndex);
+
             // Service already bound
             Intent broadcastIntent = new Intent(BC_PLAY_AUDIO_WARIH);
             sendBroadcast(broadcastIntent);
@@ -129,5 +148,41 @@ public class MainActivity extends AppCompatActivity {
         //    sendBroadcast(broadcastIntent);
         //}
         mPlayer.resumeMedia();
+    }
+
+    /*
+     * Other private methods
+     */
+
+    ArrayList<ContentData> contentList = new ArrayList<ContentData>();
+
+    private void prepareContentList() {
+        ContentResolver contentResolver = getContentResolver();
+
+        // For External Storage (SD Card, etc)
+        // Uri uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+        // For Internal Storage (good for emulator)
+        Uri uri = MediaStore.Audio.Media.INTERNAL_CONTENT_URI;
+
+        String selection = MediaStore.Audio.Media.IS_MUSIC + "!= 0";
+        String sortOrder = MediaStore.Audio.Media.TITLE + " ASC";
+
+        // Content provider
+        Cursor cursor = contentResolver.query(uri, null, selection, null, sortOrder);
+
+        if (cursor != null && cursor.getCount() > 0) {
+            contentList = new ArrayList<>();
+            while (cursor.moveToNext()) {
+                String data = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA));
+                String title = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.TITLE));
+                String album = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM));
+                String artist = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST));
+                String duration = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DURATION));
+
+                // Save to audioList
+                contentList.add(new ContentData(data, title, album, artist, duration));
+            }
+        }
+        cursor.close();
     }
 }

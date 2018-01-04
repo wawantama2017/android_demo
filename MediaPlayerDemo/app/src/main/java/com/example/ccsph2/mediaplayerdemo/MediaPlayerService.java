@@ -13,6 +13,7 @@ import android.os.IBinder;
 import android.util.Log;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 
 public class MediaPlayerService extends Service
@@ -35,7 +36,13 @@ public class MediaPlayerService extends Service
     // Audio Manager
     private AudioManager mAudioManager;
 
+    // Audio Focus
     private AudioFocusRequest mFocusRequest;
+
+    // Content Storage
+    private ArrayList<ContentData> contentList;
+    private int contentIndex = -1;
+    private ContentData activeContent; // currently playing content
 
     // Lock
     final Object mLock = new Object();
@@ -62,6 +69,19 @@ public class MediaPlayerService extends Service
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         try {
+            // Load Data from SharedPreferences
+            ContentDataStorage storage = new ContentDataStorage(getApplicationContext());
+            contentList = storage.loadContent();
+            contentIndex = storage.loadContentIndex();
+
+            // Get active content
+            if (contentIndex != -1 && contentIndex < contentList.size()) {
+                //index is in a valid range
+                activeContent = contentList.get(contentIndex);
+            } else {
+                stopSelf();
+            }
+
             // Audio file is passed to the service through putExtra()
             mMediaFile = intent.getExtras().getString("media");
         } catch (NullPointerException e) {
@@ -92,6 +112,14 @@ public class MediaPlayerService extends Service
             mMediaPlayer.release();
         }
         abandonAudioFocus();
+
+        // Unregister Broadcast Receivers
+        unregisterReceiver(receivePlayAudio);
+        unregisterReceiver(receiveAudioInterrupt);
+        unregisterReceiver(receiveAudioInterrupt);
+
+        // clear cached playlist
+        new ContentDataStorage(getApplicationContext()).cleanCachedContentList();
     }
 
     /**
@@ -234,6 +262,17 @@ public class MediaPlayerService extends Service
     private BroadcastReceiver receivePlayAudio = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
+
+            // Update active content
+            ContentDataStorage storage = new ContentDataStorage(getApplicationContext());
+            contentIndex = storage.loadContentIndex();
+            if (contentIndex != -1 && contentIndex < contentList.size()) {
+                //index is in a valid range
+                activeContent = contentList.get(contentIndex);
+            } else {
+                stopSelf();
+            }
+
             //reset to play from the beginning
             stopMedia();
             mMediaPlayer.reset();
