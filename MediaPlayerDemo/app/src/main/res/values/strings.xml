@@ -6,4 +6,5 @@
     <string name="Taptostop">Stop</string>
     <string name="Taptopause">Pause</string>
     <string name="Resume">Resume</string>
+    <string name="title_activity_opening">Media Player Playlist</string>
 </resources>
