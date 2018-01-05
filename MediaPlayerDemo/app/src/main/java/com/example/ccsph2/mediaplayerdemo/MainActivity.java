@@ -43,7 +43,6 @@ public class MainActivity extends AppCompatActivity {
                         1);
             }
         }
-        prepareContentList();
     }
 
     @Override
@@ -107,16 +106,9 @@ public class MainActivity extends AppCompatActivity {
 
     // Play Audio
     private void playMedia (String media) {
-        ContentDataStorage storage = new ContentDataStorage(getApplicationContext());
-        // temporary
-        int contentIndex = 0;
 
         // First bind
         if (!bServiceConnected) {
-            // Store Content List to Shared Preferences
-            storage.storeContent(contentList);
-            storage.storeContentIndex(contentIndex);
-
             // Throw intent
             Intent playerIntent = new Intent (this, MediaPlayerService.class);
             playerIntent.putExtra("media", media);
@@ -124,6 +116,9 @@ public class MainActivity extends AppCompatActivity {
             bindService(playerIntent, mServiceConnection, Context.BIND_AUTO_CREATE);
         }
         else {
+            ContentDataStorage storage = new ContentDataStorage(getApplicationContext());
+            // temporary
+            int contentIndex = 0;
             // Store latest selected content index
             storage.storeContentIndex(contentIndex);
 
@@ -158,41 +153,5 @@ public class MainActivity extends AppCompatActivity {
             Intent broadcastIntent = new Intent(BC_RESUME_AUDIO_WARIH);
             sendBroadcast(broadcastIntent);
         }
-    }
-
-    /*
-     * Other private methods
-     */
-
-    ArrayList<ContentData> contentList = new ArrayList<ContentData>();
-
-    private void prepareContentList() {
-        ContentResolver contentResolver = getContentResolver();
-
-        // For External Storage (SD Card, etc)
-        // Uri uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
-        // For Internal Storage (good for emulator)
-        Uri uri = MediaStore.Audio.Media.INTERNAL_CONTENT_URI;
-
-        String selection = MediaStore.Audio.Media.IS_MUSIC + "!= 0";
-        String sortOrder = MediaStore.Audio.Media.TITLE + " ASC";
-
-        // Content provider
-        Cursor cursor = contentResolver.query(uri, null, selection, null, sortOrder);
-
-        if (cursor != null && cursor.getCount() > 0) {
-            contentList = new ArrayList<>();
-            while (cursor.moveToNext()) {
-                String data = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA));
-                String title = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.TITLE));
-                String album = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM));
-                String artist = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST));
-                String duration = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DURATION));
-
-                // Save to audioList
-                contentList.add(new ContentData(data, title, album, artist, duration));
-            }
-        }
-        cursor.close();
     }
 }
