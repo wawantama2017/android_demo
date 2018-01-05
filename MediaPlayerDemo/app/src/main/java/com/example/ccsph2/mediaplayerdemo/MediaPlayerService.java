@@ -62,6 +62,12 @@ public class MediaPlayerService extends Service
 
         // register broadcast receivers
         register_playAudio();
+
+        // just in case
+        register_stopAudio();
+        register_pauseAudio();
+        register_resumeAudio();
+
         register_audioInterrupt(); // for headset plug, unplug, output change
     }
 
@@ -115,6 +121,9 @@ public class MediaPlayerService extends Service
 
         // Unregister Broadcast Receivers
         unregisterReceiver(receivePlayAudio);
+        unregisterReceiver(receiveStopAudio);
+        unregisterReceiver(receivePauseAudio);
+        unregisterReceiver(receiveResumeAudio);
         unregisterReceiver(receiveAudioInterrupt);
         unregisterReceiver(receiveAudioInterrupt);
 
@@ -250,6 +259,22 @@ public class MediaPlayerService extends Service
         registerReceiver(receivePlayAudio, filter);
     }
 
+    // Just in case for stop, pause and resume
+    private void register_stopAudio() {
+        IntentFilter filter = new IntentFilter(com.example.ccsph2.mediaplayerdemo.MainActivity.BC_STOP_AUDIO_WARIH);
+        registerReceiver(receiveStopAudio, filter);
+    }
+
+    private void register_pauseAudio(){
+        IntentFilter filter = new IntentFilter(com.example.ccsph2.mediaplayerdemo.MainActivity.BC_PAUSE_AUDIO_WARIH);
+        registerReceiver(receivePauseAudio, filter);
+    }
+
+    private void register_resumeAudio(){
+        IntentFilter filter = new IntentFilter(com.example.ccsph2.mediaplayerdemo.MainActivity.BC_RESUME_AUDIO_WARIH);
+        registerReceiver(receiveResumeAudio, filter);
+    }
+
     private void register_audioInterrupt(){
         registerReceiver(receiveAudioInterrupt, new IntentFilter(mAudioManager.ACTION_AUDIO_BECOMING_NOISY));
         registerReceiver(receiveAudioInterrupt, new IntentFilter(Intent.ACTION_HEADSET_PLUG));
@@ -279,6 +304,29 @@ public class MediaPlayerService extends Service
             initializeMediaPlayer();
         }
     };
+
+    // Just in case, prepare also receiver for stop, pause, and resume
+    private BroadcastReceiver receiveStopAudio = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            stopMedia();
+        }
+    };
+
+    private BroadcastReceiver receivePauseAudio = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            pauseMedia();
+        }
+    };
+
+    private BroadcastReceiver receiveResumeAudio = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            resumeMedia();
+        }
+    };
+
 
     private BroadcastReceiver receiveAudioInterrupt = new BroadcastReceiver() {
         @Override
