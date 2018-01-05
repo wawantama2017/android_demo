@@ -49,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
         if (bServiceConnected) {
             unbindService(mServiceConnection);
             //service is active
-            mPlayer.stopSelf();
+            //mPlayer.stopSelf();
         }
     }
 
@@ -78,6 +78,10 @@ public class MainActivity extends AppCompatActivity {
 
     public void onClickResumeButton(View view){
         resumeMedia();
+    }
+
+    public void onClickBackButton(View view){
+        finish();
     }
 
     // Bind this activity to MediaPlayer service
@@ -127,27 +131,28 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void stopMedia(){
-        //if (bServiceConnected) {
+        if (bServiceConnected) {
         //    Intent broadcastIntent = new Intent(BC_STOP_AUDIO_WARIH);
         //    sendBroadcast(broadcastIntent);
-        //}
-        mPlayer.stopMedia();
+            mPlayer.stopMedia();
+        }
+
     }
 
     private void pauseMedia(){
-        //if (bServiceConnected) {
+        if (bServiceConnected) {
         //    Intent broadcastIntent = new Intent(BC_PAUSE_AUDIO_WARIH);
         //    sendBroadcast(broadcastIntent);
-        //}
-        mPlayer.pauseMedia();
+            mPlayer.pauseMedia();
+        }
     }
 
     private void resumeMedia(){
-        //if (bServiceConnected) {
+        if (bServiceConnected) {
         //    Intent broadcastIntent = new Intent(BC_RESUME_AUDIO_WARIH);
         //    sendBroadcast(broadcastIntent);
-        //}
-        mPlayer.resumeMedia();
+            mPlayer.resumeMedia();
+        }
     }
 
     /*
