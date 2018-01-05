@@ -20,16 +20,22 @@
         <service android:name=".MediaPlayerService" />
 
         <activity android:name=".MainActivity">
+            <!--<intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter> -->
+        </activity>
+        <activity
+            android:name="com.example.ccsph2.mediaplayersample.OpeningActivity"
+            android:label="@string/title_activity_opening"
+            android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name="com.example.ccsph2.mediaplayersample.OpeningActivity"
-            android:label="@string/title_activity_opening"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>
