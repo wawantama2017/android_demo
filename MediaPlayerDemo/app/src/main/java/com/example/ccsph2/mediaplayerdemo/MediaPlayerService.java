@@ -232,6 +232,7 @@ public class MediaPlayerService extends Service
         if (mMediaPlayer == null) return;
         if (mMediaPlayer.isPlaying()) {
             mMediaPlayer.stop();
+            mCurrentPosition = 0;
         }
     }
 
@@ -243,10 +244,14 @@ public class MediaPlayerService extends Service
     }
 
     public void resumeMedia() {
-        if (!mMediaPlayer.isPlaying()) {
+        if (mCurrentPosition == 0) {
+            playMediaFromStart();
+        } else if (!mMediaPlayer.isPlaying()) {
             mMediaPlayer.seekTo(mCurrentPosition);
             mCurrentPosition = 0;
             mMediaPlayer.start();
+        } else {
+            /* do nothing */
         }
     }
 
@@ -287,23 +292,26 @@ public class MediaPlayerService extends Service
     private BroadcastReceiver receivePlayAudio = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-
-            // Update active content
-            ContentDataStorage storage = new ContentDataStorage(getApplicationContext());
-            contentIndex = storage.loadContentIndex();
-            if (contentIndex != -1 && contentIndex < contentList.size()) {
-                //index is in a valid range
-                activeContent = contentList.get(contentIndex);
-            } else {
-                stopSelf();
-            }
-
-            //reset to play from the beginning
-            stopMedia();
-            mMediaPlayer.reset();
-            initializeMediaPlayer();
+            playMediaFromStart();
         }
     };
+
+    private void playMediaFromStart() {
+        // Update active content
+        ContentDataStorage storage = new ContentDataStorage(getApplicationContext());
+        contentIndex = storage.loadContentIndex();
+        if (contentIndex != -1 && contentIndex < contentList.size()) {
+            //index is in a valid range
+            activeContent = contentList.get(contentIndex);
+        } else {
+            stopSelf();
+        }
+
+        //reset to play from the beginning
+        stopMedia();
+        mMediaPlayer.reset();
+        initializeMediaPlayer();
+    }
 
     // Just in case, prepare also receiver for stop, pause, and resume
     private BroadcastReceiver receiveStopAudio = new BroadcastReceiver() {

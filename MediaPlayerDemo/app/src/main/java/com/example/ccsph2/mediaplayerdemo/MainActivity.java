@@ -13,6 +13,7 @@ import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -29,6 +30,11 @@ public class MainActivity extends AppCompatActivity {
     private MediaPlayerService mPlayer;
     private boolean bServiceConnected = false;
 
+    // Storage access
+    private ArrayList<ContentData> contentList;
+    private int contentIndex = -1;
+    private ContentData activeContent;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,6 +49,10 @@ public class MainActivity extends AppCompatActivity {
                         1);
             }
         }
+
+        // Set TextView with Content Title
+        showContentTitle();
+        playMedia();
     }
 
     @Override
@@ -53,22 +63,6 @@ public class MainActivity extends AppCompatActivity {
             //service is active
             //mPlayer.stopSelf();
         }
-    }
-
-    public void onClickPlayButton(View view){
-
-        // For debug check external storage path
-        // File file = null;
-        // file = Environment.getExternalStorageDirectory();
-        // Log.v("WarihDebug", "root="+file.getAbsolutePath());
-
-        // Play SD card content
-        // playMedia("/storage/emulated/0/sample0.mp3");
-        // playMedia("/storage/E5E3-8FAE/sample0.mp3");
-
-        // Play internet content
-        // playMedia("https://allthingsaudio.wikispaces.com/file/view/Shuffle%20for%20K.M.mp3/139190697/Shuffle%20for%20K.M.mp3");
-        playMedia();
     }
 
     public void onClickStopButton(View view){
@@ -147,5 +141,24 @@ public class MainActivity extends AppCompatActivity {
             Intent broadcastIntent = new Intent(BC_RESUME_AUDIO_WARIH);
             sendBroadcast(broadcastIntent);
         }
+    }
+
+    /*
+     * Other private methods
+     */
+
+    private void showContentTitle() {
+        // Load Data from SharedPreferences
+        ContentDataStorage storage = new ContentDataStorage(getApplicationContext());
+        contentList = storage.loadContent();
+        contentIndex = storage.loadContentIndex();
+
+        // Get active content
+        activeContent = contentList.get(contentIndex);
+
+        // Content content path
+        TextView showTitle = (TextView) findViewById(R.id.textView2);
+        final String title = activeContent.getTitle().toString();
+        showTitle.setText(title);
     }
 }

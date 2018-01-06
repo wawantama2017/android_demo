@@ -8,4 +8,6 @@
     <string name="Resume">Resume</string>
     <string name="title_activity_opening">Media Player Playlist</string>
     <string name="BackButton">Back</string>
+    <string name="defaultText">defaultText</string>
+    <string name="tryDemo">tryDemo</string>
 </resources>
