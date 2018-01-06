@@ -11,8 +11,10 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.example.ccsph2.mediaplayerdemo.ContentData;
 import com.example.ccsph2.mediaplayerdemo.ContentDataStorage;
@@ -37,26 +39,29 @@ public class OpeningActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // Send Intent to start main activity
-                Intent intent = new Intent(view.getContext(), MainActivity.class);
-                startActivity(intent);
+                // For Debug show quick little message
+                Toast.makeText(OpeningActivity.this, "fab clicked", Toast.LENGTH_SHORT).show();
             }
         });
         // Content List Preparation
         prepareContentList();
 
         // Store ContentList to Storage
-        ContentDataStorage storage = new ContentDataStorage(getApplicationContext());
-        // temporary
-        int contentIndex = 0;
-        // Store Content List to Shared Preferences
-        storage.storeContent(contentList);
-        storage.storeContentIndex(contentIndex);
+        storeContentList();
 
-        // Present ListView using custom adapter
-        mListView = (ListView) findViewById(R.id.contentListView);
-        ContentAdapter adapter = new ContentAdapter(this, contentList);
-        mListView.setAdapter(adapter);
+        // Present content list
+        showContentList();
+
+        // Set click listener
+        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                // Send Intent to start main activity
+                Intent intent = new Intent(view.getContext(), MainActivity.class);
+                intent.putExtra("index", position);
+                startActivity(intent);
+            }
+        });
     }
 
     private void prepareContentList() {
@@ -87,5 +92,22 @@ public class OpeningActivity extends AppCompatActivity {
             }
         }
         cursor.close();
+    }
+
+    private void storeContentList() {
+        // Store ContentList to Storage
+        ContentDataStorage storage = new ContentDataStorage(getApplicationContext());
+        // temporary
+        int contentIndex = 0;
+        // Store Content List to Shared Preferences
+        storage.storeContent(contentList);
+        storage.storeContentIndex(contentIndex);
+    }
+
+    private void showContentList() {
+        // Present ListView using custom adapter
+        mListView = (ListView) findViewById(R.id.contentListView);
+        ContentAdapter adapter = new ContentAdapter(this, contentList);
+        mListView.setAdapter(adapter);
     }
 }
