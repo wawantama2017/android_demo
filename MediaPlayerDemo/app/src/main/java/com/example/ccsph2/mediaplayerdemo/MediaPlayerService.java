@@ -88,8 +88,8 @@ public class MediaPlayerService extends Service
                 stopSelf();
             }
 
-            // Audio file is passed to the service through putExtra()
-            mMediaFile = intent.getExtras().getString("media");
+            // Content content path
+            mMediaFile = activeContent.getData();
         } catch (NullPointerException e) {
             stopSelf();
         }

@@ -67,7 +67,8 @@ public class MainActivity extends AppCompatActivity {
         // playMedia("/storage/E5E3-8FAE/sample0.mp3");
 
         // Play internet content
-        playMedia("https://allthingsaudio.wikispaces.com/file/view/Shuffle%20for%20K.M.mp3/139190697/Shuffle%20for%20K.M.mp3");
+        // playMedia("https://allthingsaudio.wikispaces.com/file/view/Shuffle%20for%20K.M.mp3/139190697/Shuffle%20for%20K.M.mp3");
+        playMedia();
     }
 
     public void onClickStopButton(View view){
@@ -105,23 +106,16 @@ public class MainActivity extends AppCompatActivity {
     };
 
     // Play Audio
-    private void playMedia (String media) {
+    private void playMedia () {
 
         // First bind
         if (!bServiceConnected) {
             // Throw intent
             Intent playerIntent = new Intent (this, MediaPlayerService.class);
-            playerIntent.putExtra("media", media);
             startService(playerIntent);
             bindService(playerIntent, mServiceConnection, Context.BIND_AUTO_CREATE);
         }
         else {
-            ContentDataStorage storage = new ContentDataStorage(getApplicationContext());
-            // temporary
-            int contentIndex = 0;
-            // Store latest selected content index
-            storage.storeContentIndex(contentIndex);
-
             // Service already bound
             Intent broadcastIntent = new Intent(BC_PLAY_AUDIO_WARIH);
             sendBroadcast(broadcastIntent);

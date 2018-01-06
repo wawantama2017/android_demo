@@ -2,6 +2,7 @@ package com.example.ccsph2.mediaplayersample;
 
 import android.content.ContentResolver;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -19,6 +20,7 @@ import android.widget.Toast;
 import com.example.ccsph2.mediaplayerdemo.ContentData;
 import com.example.ccsph2.mediaplayerdemo.ContentDataStorage;
 import com.example.ccsph2.mediaplayerdemo.MainActivity;
+import com.example.ccsph2.mediaplayerdemo.Manifest;
 import com.example.ccsph2.mediaplayerdemo.R;
 
 import java.util.ArrayList;
@@ -43,6 +45,17 @@ public class OpeningActivity extends AppCompatActivity {
                 Toast.makeText(OpeningActivity.this, "fab clicked", Toast.LENGTH_SHORT).show();
             }
         });
+
+        // Explicitly set permission
+        if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            if (shouldShowRequestPermissionRationale(Manifest.permission.READ_EXTERNAL_STORAGE)) {
+                requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                        1);
+            }
+        }
+
         // Content List Preparation
         prepareContentList();
 
@@ -56,9 +69,11 @@ public class OpeningActivity extends AppCompatActivity {
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                // Store selected content index to Storage
+                ContentDataStorage storage = new ContentDataStorage(getApplicationContext());
+                storage.storeContentIndex(position);
                 // Send Intent to start main activity
                 Intent intent = new Intent(view.getContext(), MainActivity.class);
-                intent.putExtra("index", position);
                 startActivity(intent);
             }
         });
@@ -68,9 +83,9 @@ public class OpeningActivity extends AppCompatActivity {
         ContentResolver contentResolver = getContentResolver();
 
         // For External Storage (SD Card, etc)
-        // Uri uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+        Uri uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
         // For Internal Storage (good for emulator)
-        Uri uri = MediaStore.Audio.Media.INTERNAL_CONTENT_URI;
+        //Uri uri = MediaStore.Audio.Media.INTERNAL_CONTENT_URI;
 
         String selection = MediaStore.Audio.Media.IS_MUSIC + "!= 0";
         String sortOrder = MediaStore.Audio.Media.TITLE + " ASC";
@@ -97,11 +112,8 @@ public class OpeningActivity extends AppCompatActivity {
     private void storeContentList() {
         // Store ContentList to Storage
         ContentDataStorage storage = new ContentDataStorage(getApplicationContext());
-        // temporary
-        int contentIndex = 0;
         // Store Content List to Shared Preferences
         storage.storeContent(contentList);
-        storage.storeContentIndex(contentIndex);
     }
 
     private void showContentList() {
