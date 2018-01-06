@@ -53,16 +53,9 @@ public class OpeningActivity extends AppCompatActivity {
         storage.storeContent(contentList);
         storage.storeContentIndex(contentIndex);
 
-        // Present ListView
+        // Present ListView using custom adapter
         mListView = (ListView) findViewById(R.id.contentListView);
-        String[] listItems = new String[contentList.size()];
-
-        for (int i=0; i < contentList.size(); i++){
-            ContentData contentData = contentList.get(i);
-            listItems[i] = contentData.getTitle();
-        }
-
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, listItems);
+        ContentAdapter adapter = new ContentAdapter(this, contentList);
         mListView.setAdapter(adapter);
     }
 
