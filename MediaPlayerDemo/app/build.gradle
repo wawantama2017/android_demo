@@ -28,4 +28,5 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
 
     compile group: 'com.google.code.gson', name: 'gson', version: '2.7', changing: true
+    implementation 'com.google.android.gms:play-services-maps:11.8.0'
 }

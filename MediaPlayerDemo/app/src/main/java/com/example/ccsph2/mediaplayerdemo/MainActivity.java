@@ -7,14 +7,18 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.IBinder;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.MediaController;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.VideoView;
 
 import java.util.ArrayList;
 
@@ -50,9 +54,13 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
+
+        showVideoView();
+        //Thread.sleep(500);
         // Set TextView with Content Title
         showContentTitle();
-        playMedia();
+        //playMedia();  // playMedia execution moved after VideoView prepared. to avoid muted.
+                        // refer to onPrepared in VideoView
     }
 
     @Override
@@ -160,5 +168,38 @@ public class MainActivity extends AppCompatActivity {
         TextView showTitle = (TextView) findViewById(R.id.textView2);
         final String title = activeContent.getTitle().toString();
         showTitle.setText(title);
+    }
+
+    VideoView videoview;
+    private void showVideoView() {
+
+        //String VideoURL = "http://www.androidbegin.com/tutorial/AndroidCommercial.3gp";
+        String VideoURL = "http://192.168.11.15/demo.mp4"; // my own server
+
+        videoview = (VideoView) findViewById(R.id.videoView);
+
+        //MediaController mediacontroller = new MediaController(MainActivity.this);
+        //mediacontroller.setAnchorView(videoview);
+        // Get the URL
+        Uri video = Uri.parse(VideoURL);
+        //videoview.setMediaController(mediacontroller);
+        videoview.setVideoURI(video);
+
+        videoview.clearFocus();
+        videoview.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+            // Close the progress bar and play the video
+            public void onPrepared(MediaPlayer mp) {
+                //pDialog.dismiss();
+                videoview.start();
+
+                // mute audio in VideoView
+                mp.setVolume(0f, 0f);
+                mp.setLooping(true);
+
+                // play media here
+                playMedia();
+            }
+        });
+
     }
 }
