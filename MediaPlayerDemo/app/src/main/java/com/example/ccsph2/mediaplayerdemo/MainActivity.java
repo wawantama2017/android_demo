@@ -10,12 +10,14 @@ import android.database.Cursor;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.Handler;
 import android.os.IBinder;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.MediaController;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
@@ -38,6 +40,15 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<ContentData> contentList;
     private int contentIndex = -1;
     private ContentData activeContent;
+
+    // Video View
+    private VideoView videoview;
+
+    // Seek bar
+    private SeekBar mContentSeekBar;
+
+    // Handler for seek bar update
+    private Handler mHandler = new Handler();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,6 +97,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onClickBackButton(View view){
+        mHandler.removeCallbacks(mTask);
         finish();
     }
 
@@ -170,7 +182,6 @@ public class MainActivity extends AppCompatActivity {
         showTitle.setText(title);
     }
 
-    VideoView videoview;
     private void showVideoView() {
 
         //String VideoURL = "http://www.androidbegin.com/tutorial/AndroidCommercial.3gp";
@@ -198,8 +209,77 @@ public class MainActivity extends AppCompatActivity {
 
                 // play media here
                 playMedia();
+                updateSeekBar();
             }
         });
 
+    }
+
+    /*
+     * Seek Bar
+     */
+    private void updateSeekBar() {
+
+        mContentSeekBar = (SeekBar) findViewById(R.id.contentSeekBar);
+        // Listeners
+        mContentSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+
+            }
+        });
+
+        // Set Range
+        mContentSeekBar.setProgress(0);
+        mContentSeekBar.setMax(100);
+
+        mHandler.postDelayed(mTask, 100);
+    }
+
+    /*
+     * Thread
+     */
+
+    private Runnable mTask = new Runnable() {
+        @Override
+        public void run() {
+            long duration = mPlayer.getDuration();
+            long currentPosition = mPlayer.getCurrentPosition();
+
+            // Update progress bar
+            int progress = getProgressPercentage(duration, currentPosition);
+            mContentSeekBar.setProgress(progress);
+
+            // Running this thread after 100 milliseconds
+            mHandler.postDelayed(this, 100);
+        }
+    };
+
+    /*
+     * Utility
+     */
+
+    private int getProgressPercentage (long duration, long position) {
+        Double percentage = (double) 0;
+
+        long currentSeconds = (int) (position / 1000);
+        long totalSeconds = (int) (duration / 1000);
+
+        // calculating percentage
+        percentage =(((double)currentSeconds)/totalSeconds)*100;
+
+        // return percentage
+        return percentage.intValue();
     }
 }

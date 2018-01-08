@@ -255,6 +255,16 @@ public class MediaPlayerService extends Service
         }
     }
 
+    public long getCurrentPosition() {
+       return mMediaPlayer.getCurrentPosition();
+    }
+
+    public long getDuration() {
+        return mMediaPlayer.getDuration();
+    }
+
+
+
     /**
      * Broadcast Receivers Registration
      */
