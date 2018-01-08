@@ -140,7 +140,7 @@ public class MediaPlayerService extends Service
         //Invoked when playback of a media source has completed.
         stopMedia();
         //stop the service
-        stopSelf();
+        //stopSelf();
     }
 
     @Override

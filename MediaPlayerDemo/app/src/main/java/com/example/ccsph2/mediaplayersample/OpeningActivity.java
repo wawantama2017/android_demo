@@ -83,7 +83,7 @@ public class OpeningActivity extends AppCompatActivity {
         ContentResolver contentResolver = getContentResolver();
 
         // For External Storage (SD Card, etc)
-        //Uri uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+        // Uri uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
         // For Internal Storage (good for emulator)
         Uri uri = MediaStore.Audio.Media.INTERNAL_CONTENT_URI;
 
