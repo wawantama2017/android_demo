@@ -1,4 +1,4 @@
-package com.example.ccsph2.mediaplayersample;
+package com.example.ccsph2.mediaplayerplaylist;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -8,11 +8,7 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.example.ccsph2.mediaplayerdemo.ContentData;
-import com.example.ccsph2.mediaplayerdemo.R;
 
-import org.w3c.dom.Text;
-
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 /**

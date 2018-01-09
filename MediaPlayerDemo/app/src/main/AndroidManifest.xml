@@ -27,7 +27,7 @@
             </intent-filter> -->
         </activity>
         <activity
-            android:name="com.example.ccsph2.mediaplayersample.OpeningActivity"
+            android:name="com.example.ccsph2.mediaplayerplaylist.OpeningActivity"
             android:label="@string/title_activity_opening"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
