@@ -40,9 +40,9 @@ public class MediaPlayerService extends Service
     private AudioFocusRequest mFocusRequest;
 
     // Content Storage
-    private ArrayList<ContentData> contentList;
-    private int contentIndex = -1;
-    private ContentData activeContent; // currently playing content
+    private ArrayList<ContentData> mContentList;
+    private int mContentIndex;
+    private ContentData mActiveContent; // currently playing content
 
     // Lock
     final Object mLock = new Object();
@@ -77,19 +77,19 @@ public class MediaPlayerService extends Service
         try {
             // Load Data from SharedPreferences
             ContentDataStorage storage = new ContentDataStorage(getApplicationContext());
-            contentList = storage.loadContent();
-            contentIndex = storage.loadContentIndex();
+            mContentList = storage.loadContent();
+            mContentIndex = storage.loadContentIndex();
 
             // Get active content
-            if (contentIndex != -1 && contentIndex < contentList.size()) {
+            if (mContentIndex != -1 && mContentIndex < mContentList.size()) {
                 //index is in a valid range
-                activeContent = contentList.get(contentIndex);
+                mActiveContent = mContentList.get(mContentIndex);
             } else {
                 stopSelf();
             }
 
             // Content content path
-            mMediaFile = activeContent.getData();
+            mMediaFile = mActiveContent.getData();
         } catch (NullPointerException e) {
             stopSelf();
         }
@@ -228,6 +228,10 @@ public class MediaPlayerService extends Service
         }
     }
 
+    /**
+     * Public methods
+     */
+
     public void stopMedia() {
         if (mMediaPlayer == null) return;
         if (mMediaPlayer.isPlaying()) {
@@ -262,6 +266,8 @@ public class MediaPlayerService extends Service
     public long getDuration() {
         return mMediaPlayer.getDuration();
     }
+
+    public void seekTo(int msec) {mMediaPlayer.seekTo(msec);}
 
 
 
@@ -309,10 +315,10 @@ public class MediaPlayerService extends Service
     private void playMediaFromStart() {
         // Update active content
         ContentDataStorage storage = new ContentDataStorage(getApplicationContext());
-        contentIndex = storage.loadContentIndex();
-        if (contentIndex != -1 && contentIndex < contentList.size()) {
+        mContentIndex = storage.loadContentIndex();
+        if (mContentIndex != -1 && mContentIndex < mContentList.size()) {
             //index is in a valid range
-            activeContent = contentList.get(contentIndex);
+            mActiveContent = mContentList.get(mContentIndex);
         } else {
             stopSelf();
         }

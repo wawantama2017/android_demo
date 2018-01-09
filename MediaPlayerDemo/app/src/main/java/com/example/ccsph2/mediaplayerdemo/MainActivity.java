@@ -37,15 +37,16 @@ public class MainActivity extends AppCompatActivity {
     private boolean bServiceConnected = false;
 
     // Storage access
-    private ArrayList<ContentData> contentList;
-    private int contentIndex = -1;
-    private ContentData activeContent;
+    private ArrayList<ContentData> mContentList;
+    private int mContentIndex;
+    private ContentData mActiveContent;
 
     // Video View
-    private VideoView videoview;
+    private VideoView mVideoView;
 
     // Seek bar
     private SeekBar mContentSeekBar;
+    private long mUpdatePeriod = 100;
 
     // Handler for seek bar update
     private Handler mHandler = new Handler();
@@ -65,11 +66,12 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-
+        // Display Video View
         showVideoView();
-        //Thread.sleep(500);
+
         // Set TextView with Content Title
         showContentTitle();
+
         //playMedia();  // playMedia execution moved after VideoView prepared. to avoid muted.
                         // refer to onPrepared in VideoView
     }
@@ -163,22 +165,22 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    /*
+    /**
      * Other private methods
      */
 
     private void showContentTitle() {
         // Load Data from SharedPreferences
         ContentDataStorage storage = new ContentDataStorage(getApplicationContext());
-        contentList = storage.loadContent();
-        contentIndex = storage.loadContentIndex();
+        mContentList = storage.loadContent();
+        mContentIndex = storage.loadContentIndex();
 
         // Get active content
-        activeContent = contentList.get(contentIndex);
+        mActiveContent = mContentList.get(mContentIndex);
 
         // Content content path
         TextView showTitle = (TextView) findViewById(R.id.textView2);
-        final String title = activeContent.getTitle().toString();
+        final String title = mActiveContent.getTitle().toString();
         showTitle.setText(title);
     }
 
@@ -187,21 +189,21 @@ public class MainActivity extends AppCompatActivity {
         //String VideoURL = "http://www.androidbegin.com/tutorial/AndroidCommercial.3gp";
         String VideoURL = "http://192.168.11.15/demo.mp4"; // my own server
 
-        videoview = (VideoView) findViewById(R.id.videoView);
+        mVideoView = (VideoView) findViewById(R.id.videoView);
 
         //MediaController mediacontroller = new MediaController(MainActivity.this);
-        //mediacontroller.setAnchorView(videoview);
+        //mediacontroller.setAnchorView(mVideoView);
         // Get the URL
         Uri video = Uri.parse(VideoURL);
-        //videoview.setMediaController(mediacontroller);
-        videoview.setVideoURI(video);
+        //mVideoView.setMediaController(mediacontroller);
+        mVideoView.setVideoURI(video);
 
-        videoview.clearFocus();
-        videoview.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+        mVideoView.clearFocus();
+        mVideoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
             // Close the progress bar and play the video
             public void onPrepared(MediaPlayer mp) {
                 //pDialog.dismiss();
-                videoview.start();
+                mVideoView.start();
 
                 // mute audio in VideoView
                 mp.setVolume(0f, 0f);
@@ -209,29 +211,39 @@ public class MainActivity extends AppCompatActivity {
 
                 // play media here
                 playMedia();
+                prepareSeekBar();
                 updateSeekBar();
             }
         });
 
     }
 
-    /*
+    /**
      * Seek Bar
      */
-    private void updateSeekBar() {
 
+    private void prepareSeekBar() {
         mContentSeekBar = (SeekBar) findViewById(R.id.contentSeekBar);
         // Listeners
         mContentSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
 
             @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                // remove message Handler from updating progress bar
+                mHandler.removeCallbacks(mTask);
             }
 
             @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                mHandler.removeCallbacks(mTask);
+                int duration = (int) mPlayer.getDuration();
+                int currentPosition = progressToMsec(seekBar.getProgress(), duration);
 
+                // forward or backward to certain seconds
+                mPlayer.seekTo(currentPosition);
+
+                // update timer progress again
+                updateSeekBar();
             }
 
             @Override
@@ -243,11 +255,13 @@ public class MainActivity extends AppCompatActivity {
         // Set Range
         mContentSeekBar.setProgress(0);
         mContentSeekBar.setMax(100);
-
-        mHandler.postDelayed(mTask, 100);
     }
 
-    /*
+    private void updateSeekBar() {
+        mHandler.postDelayed(mTask, mUpdatePeriod);
+    }
+
+    /**
      * Thread
      */
 
@@ -261,12 +275,12 @@ public class MainActivity extends AppCompatActivity {
             int progress = getProgressPercentage(duration, currentPosition);
             mContentSeekBar.setProgress(progress);
 
-            // Running this thread after 100 milliseconds
-            mHandler.postDelayed(this, 100);
+            // Running this thread after designated period
+            mHandler.postDelayed(this, mUpdatePeriod);
         }
     };
 
-    /*
+    /**
      * Utility
      */
 
@@ -281,5 +295,14 @@ public class MainActivity extends AppCompatActivity {
 
         // return percentage
         return percentage.intValue();
+    }
+
+    private int progressToMsec(int progress, int duration) {
+        int currentPosition = 0;
+        duration = duration / 1000;
+        currentPosition = (int) ((((double)progress) / 100) * duration);
+
+        // return current duration in milliseconds
+        return currentPosition * 1000;
     }
 }

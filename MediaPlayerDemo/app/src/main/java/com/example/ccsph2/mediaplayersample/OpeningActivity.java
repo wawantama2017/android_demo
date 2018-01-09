@@ -28,7 +28,7 @@ import java.util.ArrayList;
 public class OpeningActivity extends AppCompatActivity {
 
     private ListView mListView;
-    private ArrayList<ContentData> contentList = new ArrayList<ContentData>();
+    private ArrayList<ContentData> mContentList = new ArrayList<ContentData>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,7 +94,7 @@ public class OpeningActivity extends AppCompatActivity {
         Cursor cursor = contentResolver.query(uri, null, selection, null, sortOrder);
 
         if (cursor != null && cursor.getCount() > 0) {
-            contentList = new ArrayList<>();
+            mContentList = new ArrayList<>();
             while (cursor.moveToNext()) {
                 String data = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA));
                 String title = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.TITLE));
@@ -103,7 +103,7 @@ public class OpeningActivity extends AppCompatActivity {
                 String duration = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DURATION));
 
                 // Save to audioList
-                contentList.add(new ContentData(data, title, album, artist, duration));
+                mContentList.add(new ContentData(data, title, album, artist, duration));
             }
         }
         cursor.close();
@@ -113,13 +113,13 @@ public class OpeningActivity extends AppCompatActivity {
         // Store ContentList to Storage
         ContentDataStorage storage = new ContentDataStorage(getApplicationContext());
         // Store Content List to Shared Preferences
-        storage.storeContent(contentList);
+        storage.storeContent(mContentList);
     }
 
     private void showContentList() {
         // Present ListView using custom adapter
         mListView = (ListView) findViewById(R.id.contentListView);
-        ContentAdapter adapter = new ContentAdapter(this, contentList);
+        ContentAdapter adapter = new ContentAdapter(this, mContentList);
         mListView.setAdapter(adapter);
     }
 }
